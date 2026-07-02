@@ -120,8 +120,7 @@ def main() -> None:
         
         summary.append({'engine': engine, 'mode': mode, **metrics})
         
-    write_csv(out_dir / f'{engine}_before_after_summary.csv', summary)
-    
+    write_csv(out_dir / 'before_after_summary.csv', summary)    
     print("\nRÉSUMÉ DES PERFORMANCES :", file=sys.stderr)
     print(json.dumps(summary, indent=2))
 
