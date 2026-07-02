@@ -44,8 +44,8 @@ h1 { max-width: 75% !important; }
     z-index: 9999;
 }
 .logo-top-right img {
-    width: 275px;
-    height: 275px;
+    width: 276px;
+    height: 276px;
     border-radius: 58px;
 }
 .step-card {
