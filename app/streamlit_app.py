@@ -27,6 +27,8 @@ st.markdown("""
     --text-main:  #E8F4FF;
     --text-muted: #8AB4D4;
 }
+
+h1 { max-width: 75% !important; }
 .stApp { background-color: var(--bg-main); color: var(--text-main); }
 #MainMenu, footer { visibility: hidden; }
 [data-testid="stMetricValue"] { color: var(--accent) !important; font-weight: 700 !important; }
@@ -42,8 +44,8 @@ st.markdown("""
     z-index: 9999;
 }
 .logo-top-right img {
-    width: 200px;
-    height: 200px;
+    width: 275px;
+    height: 275px;
     border-radius: 28px;
 }
 .step-card {
@@ -79,7 +81,7 @@ if "analyse_count" not in st.session_state:
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("### 📊 Session en cours")
+    st.markdown("### Session en cours")
     st.metric("Images analysées", st.session_state.analyse_count)
     st.markdown("---")
     st.markdown("**Arvi-RX** v0.1 — prototype pédagogique")
