@@ -10,7 +10,7 @@ eval/outputs/
 .DS_Store
 
 # Local/professor visual material
-assets/
+# assets/
 
 # Local review / rollback material
 .rollback*/
