@@ -35,11 +35,11 @@ def run(engine: str, mode: str, db_path: Path) -> tuple[list[dict], dict]:
     rows = []
     init_db(db_path)
     
-    print(f"\n--- Lancement de l'évaluation : Moteur = {engine.upper()} | Mode = {mode.upper()} ---")
+    print(f"\n--- Lancement de l'évaluation : Moteur = {engine.upper()} | Mode = {mode.upper()} ---", file=sys.stderr)
     
     for case in cases:
         image_path = ROOT / case['image_path']
-        print(f"Analyse en cours : {image_path.name}...")
+        print(f"Analyse en cours : {image_path.name}...", file=sys.stderr)
         
         # 1. Choix du moteur d'inférence
         if engine == 'toy':
@@ -121,7 +121,8 @@ def main() -> None:
         summary.append({'engine': engine, 'mode': mode, **metrics})
         
     write_csv(out_dir / f'{engine}_before_after_summary.csv', summary)
-    print("\nRÉSUMÉ DES PERFORMANCES :")
+    
+    print("\nRÉSUMÉ DES PERFORMANCES :", file=sys.stderr)
     print(json.dumps(summary, indent=2))
 
 
