@@ -153,14 +153,14 @@ with st.sidebar:
     st.markdown("### Session en cours")
     st.metric("Images analysées", st.session_state.analyse_count)
     st.markdown("---")
-    st.markdown("**Arvi-RX** v0.1 — prototype pédagogique")
+    st.markdown("**Arvi-RX** v0.1 — prototype médical")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE ACCUEIL
 # ══════════════════════════════════════════════════════════════════════════════
 if st.session_state.page == "accueil":
     st.title("Arvi-RX — Assistant radiologue virtuel")
-    st.markdown("<p style='color:#8AB4D4; font-size:1.1rem;'>Prototype pédagogique d'analyse de radiographies thoraciques par intelligence artificielle</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#8AB4D4; font-size:1.1rem;'>Prototype médical d'analyse de radiographies thoraciques par intelligence artificielle</p>", unsafe_allow_html=True)
     st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
     st.markdown("#### Choisissez votre espace")
