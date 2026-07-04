@@ -17,49 +17,71 @@ st.set_page_config(page_title="Arvi-RX", layout="wide")
 DB_PATH = "medical_ai_evidence.sqlite"
 SAMPLE_DIR = Path("images")
 
-# ── CSS ───────────────────────────────────────────────────────────────────────
-st.markdown("""
-<style>
-:root {
+# ── Session state ─────────────────────────────────────────────────────────────
+if "page" not in st.session_state:
+    st.session_state.page = "accueil"
+if "analyse_count" not in st.session_state:
+    st.session_state.analyse_count = 0
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"
+
+# ── Thème dynamique ───────────────────────────────────────────────────────────
+if st.session_state.theme == "dark":
+    THEME_VARS = """
     --bg-main:    #0D1B2A;
     --bg-card:    #1a3a6e;
     --bg-card2:   #1A3A5C;
     --accent:     #2A8FD4;
     --text-main:  #E8F4FF;
     --text-muted: #8AB4D4;
-}
-h1 { max-width: 75% !important; }
-.stApp { background-color: var(--bg-main); color: var(--text-main); }
-#MainMenu, footer { visibility: hidden; }
-[data-testid="stMetricValue"] { color: var(--accent) !important; font-weight: 700 !important; }
-.stSelectbox > div > div, .stFileUploader > div {
+    """
+else:
+    THEME_VARS = """
+    --bg-main:    #F4F7FB;
+    --bg-card:    #FFFFFF;
+    --bg-card2:   #DCE6F0;
+    --accent:     #1E6FB8;
+    --text-main:  #0D1B2A;
+    --text-muted: #4A6580;
+    """
+
+st.markdown(f"""
+<style>
+:root {{
+    {THEME_VARS}
+}}
+h1 {{ max-width: 75% !important; }}
+.stApp {{ background-color: var(--bg-main); color: var(--text-main); }}
+#MainMenu, footer {{ visibility: hidden; }}
+[data-testid="stMetricValue"] {{ color: var(--accent) !important; font-weight: 700 !important; }}
+.stSelectbox > div > div, .stFileUploader > div {{
     background-color: var(--bg-card) !important;
     border: 1px solid var(--bg-card2) !important;
     border-radius: 8px !important;
-}
-.logo-top-right {
+}}
+.logo-top-right {{
     position: absolute;
     top: -60px;
     right: 24px;
     z-index: 9999;
-}
-.logo-top-right img {
+}}
+.logo-top-right img {{
     width: 276px;
     height: 276px;
     border-radius: 58px;
-}
-.step-card {
+}}
+.step-card {{
     background: var(--bg-card);
     border: 1px solid var(--bg-card2);
     border-radius: 12px;
     padding: 24px 20px;
     text-align: center;
-}
-.step-icon { font-size: 2rem; margin-bottom: 10px; }
-.step-title { font-weight: 700; color: var(--text-main); font-size: 1rem; margin-bottom: 6px; }
-.step-desc { color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; }
-.divider { border: none; border-top: 1px solid var(--bg-card2); margin: 28px 0; }
-.nav-card {
+}}
+.step-icon {{ font-size: 2rem; margin-bottom: 10px; }}
+.step-title {{ font-weight: 700; color: var(--text-main); font-size: 1rem; margin-bottom: 6px; }}
+.step-desc {{ color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; }}
+.divider {{ border: none; border-top: 1px solid var(--bg-card2); margin: 28px 0; }}
+.nav-card {{
     background: var(--bg-card);
     border: 1px solid var(--bg-card2);
     border-radius: 16px;
@@ -68,22 +90,31 @@ h1 { max-width: 75% !important; }
     cursor: pointer;
     transition: border-color 0.2s;
     height: 220px;
-}
-.nav-card:hover { border-color: var(--accent); }
-.nav-icon { font-size: 3rem; margin-bottom: 14px; }
-.nav-title { font-weight: 700; color: var(--text-main); font-size: 1.1rem; margin-bottom: 8px; }
-.nav-desc { color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; }
-.sample-card {
+}}
+.nav-card:hover {{ border-color: var(--accent); }}
+.nav-card-analyse {{
+    background: #1e5aa8;
+    border: 1px solid #2A8FD4;
+    border-radius: 16px;
+    padding: 32px 24px;
+    text-align: center;
+    cursor: pointer;
+    height: 220px;
+}}
+.nav-icon {{ font-size: 3rem; margin-bottom: 14px; }}
+.nav-title {{ font-weight: 700; color: var(--text-main); font-size: 1.1rem; margin-bottom: 8px; }}
+.nav-desc {{ color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; }}
+.sample-card {{
     background: var(--bg-card);
     border: 1px solid var(--bg-card2);
     border-radius: 12px;
     padding: 16px;
     text-align: center;
     margin-bottom: 12px;
-}
-.badge-normal { color: #2ecc71; font-weight: 700; }
-.badge-opacity { color: #f39c12; font-weight: 700; }
-.badge-uncertain { color: #e74c3c; font-weight: 700; }
+}}
+.badge-normal {{ color: #2ecc71; font-weight: 700; }}
+.badge-opacity {{ color: #f39c12; font-weight: 700; }}
+.badge-uncertain {{ color: #e74c3c; font-weight: 700; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -96,15 +127,9 @@ def load_logo(path: str) -> str:
 
 st.markdown(f"""
 <div class="logo-top-right">
-    {load_logo("images/assets/logo.png")}
+    {load_logo("images/assets/logo final.png")}
 </div>
 """, unsafe_allow_html=True)
-
-# ── Session state ─────────────────────────────────────────────────────────────
-if "page" not in st.session_state:
-    st.session_state.page = "accueil"
-if "analyse_count" not in st.session_state:
-    st.session_state.analyse_count = 0
 
 # ── DB helpers ────────────────────────────────────────────────────────────────
 def get_connection():
@@ -150,6 +175,11 @@ with st.sidebar:
     if st.button("  Apprentissage", use_container_width=True):
         st.session_state.page = "apprentissage"
     st.markdown("---")
+    theme_label = "☀️ Mode jour" if st.session_state.theme == "dark" else "🌙 Mode nuit"
+    if st.button(theme_label, use_container_width=True):
+        st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
+        st.rerun()
+    st.markdown("---")
     st.markdown("### Session en cours")
     st.metric("Images analysées", st.session_state.analyse_count)
     st.markdown("---")
@@ -164,30 +194,37 @@ if st.session_state.page == "accueil":
     st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
     st.markdown("#### Choisissez votre espace")
-    c1, c2, c3 = st.columns(3)
-    with c1:
+
+    # ── Ligne 1 : Analyse centré ──────────────────────────────────────────────
+    col_left, col_centre, col_right = st.columns([1, 2, 1])
+    with col_centre:
         st.markdown("""
-        <div class="nav-card">
+        <div class="nav-card-analyse">
             <div class="nav-icon">🩻</div>
-            <div class="nav-title">Espace Analyse</div>
+            <div class="nav-title">Analyse</div>
             <div class="nav-desc">Analysez une radiographie thoracique et obtenez un diagnostic assisté par IA.</div>
         </div>
         """, unsafe_allow_html=True)
         if st.button("Accéder à l'analyse", use_container_width=True):
             st.session_state.page = "analyse"
             st.rerun()
-    with c2:
+
+    st.markdown("<div style='margin-bottom:16px'></div>", unsafe_allow_html=True)
+
+    # ── Ligne 2 : Rapports + Apprentissage ───────────────────────────────────
+    col_l, col_r2, col_r3, col_rr = st.columns([1, 2, 2, 1])
+    with col_r2:
         st.markdown("""
         <div class="nav-card">
             <div class="nav-icon">📋</div>
-            <div class="nav-title">Espace Rapports</div>
+            <div class="nav-title">Historique Rapports</div>
             <div class="nav-desc">Consultez l'historique de toutes les analyses effectuées et leurs résultats.</div>
         </div>
         """, unsafe_allow_html=True)
         if st.button("Accéder aux rapports", use_container_width=True):
             st.session_state.page = "rapports"
             st.rerun()
-    with c3:
+    with col_r3:
         st.markdown("""
         <div class="nav-card">
             <div class="nav-icon">🎓</div>
