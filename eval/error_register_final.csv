@@ -1,0 +1,9 @@
+case_id,ground_truth,prediction,error_type,severity,comment,corrective_action
+RSNA_003,uncertain,suspected_opacity,other,medium,model hedged in text but still picked a class,force uncertain when text shows doubt
+RSNA_004,normal,suspected_opacity,FP,medium,model hedged in text but still picked a class,force uncertain when text shows doubt
+RSNA_006,uncertain,suspected_opacity,other,medium,model hedged in text but still picked a class,force uncertain when text shows doubt
+RSNA_009,uncertain,suspected_opacity,other,medium,model hedged in text but still picked a class,force uncertain when text shows doubt
+RSNA_012,uncertain,suspected_opacity,other,medium,model hedged in text but still picked a class,force uncertain when text shows doubt
+RSNA_015,uncertain,suspected_opacity,other,medium,model hedged in text but still picked a class,force uncertain when text shows doubt
+RSNA_018,uncertain,normal,other,high,model was confident but got it wrong,review this case manually
+RSNA_019,normal,uncertain,UA,medium,model flagged an issue on an image that is actually normal,review sensitivity; check why normal cases get flagged
