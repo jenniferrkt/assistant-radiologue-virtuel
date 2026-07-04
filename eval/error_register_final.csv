@@ -1,6 +1,0 @@
-case_id,image,ground_truth,prediction,error_type,severity,comment,corrective_action;
-RSNA_003,image01_uncertain.png,uncertain,suspected_opacity,other,medium,model was not sure but still picked a class,make model say uncertain when its text shows doubt;
-RSNA_009,image03_uncertain.png,uncertain,suspected_opacity,other,medium,model hesitated in text but still picked a class,same fix as above; check confidence threshold
-RSNA_012,image04_uncertain.png,uncertain,suspected_opacity,other,medium,model mentioned it could be harmless but did not say uncertain,add more training examples of harmless unclear cases;
-RSNA_015,image05_uncertain.png,uncertain,normal,other,high,model said normal but its own text shows doubt,priority fix: force uncertain when text shows doubt even if class is normal; risky,priority fix: force uncertain when text shows doubt even if class is normal
-RSNA_018,image06_uncertain.png,uncertain,normal,other,high,same problem as RSNA_015,same priority fix as RSNA_015;
