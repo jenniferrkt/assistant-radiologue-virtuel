@@ -10,8 +10,6 @@ eval/outputs/
 .env
 .DS_Store
 
-# Local/professor visual material
-assets/
 
 # Local review / rollback material
 .rollback*/
