@@ -14,7 +14,32 @@ from src.guardrails import apply_safety_guardrails
 
 st.set_page_config(page_title="Scan-R", layout="wide")
 
-DB_PATH = "medical_ai_evidence.sqlite"
+BASE_DIR = Path(__file__).parent
+DB_PATH = BASE_DIR / "medical_ai_evidence.sqlite"
+
+# 2. On s'assure que la table existe au démarrage
+def init_db():
+    con = sqlite3.connect(DB_PATH)
+    cur = con.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS runs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            image_path TEXT,
+            model_name TEXT,
+            prompt_version TEXT,
+            prediction_json TEXT,
+            predicted_class TEXT,
+            confidence REAL,
+            latency_ms INTEGER,
+            created_at TEXT
+        )
+    """)
+    con.commit()
+    con.close()
+
+# On lance l'initialisation tout de suite
+init_db()
+# ----------------------------------------------
 SAMPLE_DIR = Path("data/sample_images")
 
 # ── Session state ─────────────────────────────────────────────────────────────
