@@ -16,7 +16,7 @@ WARNING = "Prototype pédagogique. Non destiné au diagnostic. Validation par un
 # ---------------------------------------------------------
 
 LOCAL_SERVER_URL = "http://100.79.99.38:1234/v1"
-MODEL_NAME = "medgemma-4b"
+MODEL_NAME = "gemma"
 
 client = OpenAI(base_url=LOCAL_SERVER_URL, api_key="not-needed")
 

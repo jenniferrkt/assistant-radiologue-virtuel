@@ -9,7 +9,7 @@ from datetime import datetime
 import streamlit as st
 from PIL import Image
 
-from src.inference import toy_predict
+from src.inference import toy_predict, vlm_predict
 from src.guardrails import apply_safety_guardrails
 
 st.set_page_config(page_title="Scan-R", layout="wide")
@@ -17,7 +17,7 @@ st.set_page_config(page_title="Scan-R", layout="wide")
 DB_PATH = "medical_ai_evidence.sqlite"
 SAMPLE_DIR = Path("data/sample_images")
 
-#  Session state
+# ── Session state ─────────────────────────────────────────────────────────────
 if "page" not in st.session_state:
     st.session_state.page = "accueil"
 if "analyse_count" not in st.session_state:
@@ -27,7 +27,7 @@ if "rapport_detail" not in st.session_state:
 if "theme" not in st.session_state:
     st.session_state.theme = "dark"
 
-#  Thème dynamique
+# ── Thème dynamique ───────────────────────────────────────────────────────────
 if st.session_state.theme == "dark":
     THEME_VARS = """
     --bg-main:    #0D1B2A;
@@ -156,7 +156,7 @@ label, .stSelectbox label, .stFileUploader label {{
 </style>
 """, unsafe_allow_html=True)
 
-#  Logo
+# ── Logo ──────────────────────────────────────────────────────────────────────
 def load_logo(path: str) -> str:
     with open(path, "rb") as f:
         data = base64.b64encode(f.read()).decode()
@@ -169,7 +169,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-#  DB helpers
+# ── DB helpers ────────────────────────────────────────────────────────────────
 def get_connection():
     return sqlite3.connect(DB_PATH)
 
@@ -182,11 +182,11 @@ def save_run(image_path: str, pred: dict, mode: str):
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         image_path,
-        pred.get("model_name", f"toy-rule-{mode}"),
+        pred.get("model_name", f"model-{mode}"),
         pred.get("prompt_version", f"{mode}_v1"),
         json.dumps(pred),
-        pred["predicted_class"],
-        pred["confidence"],
+        pred.get("predicted_class", "Inconnu"),
+        pred.get("confidence", 0.0),
         pred.get("latency_ms", 0),
         datetime.now().isoformat(),
     ))
@@ -201,7 +201,7 @@ def load_runs():
     con.close()
     return rows
 
-#  Sidebar navigation
+# ── Sidebar navigation ────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("### Navigation")
     if st.button("Accueil", use_container_width=True):
@@ -338,7 +338,8 @@ elif st.session_state.page == "analyse":
     st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
     uploaded = st.file_uploader("Déposer une radiographie thoracique frontale", type=["png", "jpg", "jpeg"])
-    mode = st.selectbox("Mode", ["baseline", "improved"])
+    # Mode exact demandé : "toy", "baseline", "improved"
+    moteur = st.selectbox("Mode", ["toy", "baseline", "improved"])
 
     if uploaded:
         suffix = Path(uploaded.name).suffix
@@ -349,14 +350,35 @@ elif st.session_state.page == "analyse":
         col1, col2 = st.columns([1, 1])
         with col1:
             st.image(Image.open(tmp_path), caption="Image uploadée", use_container_width=True)
+            
         with col2:
-            pred = apply_safety_guardrails(toy_predict(uploaded.name, mode=mode))
+            # 1. Sélection et exécution de l'IA (Simulation vs MedGemma)
+            if moteur == "toy":
+                raw_pred = toy_predict(tmp_path, mode="baseline")
+            else:
+                nom_fichier_prompt = f"{moteur}_prompt.txt"
+                chemin_prompt = f"./prompts/{nom_fichier_prompt}"
+                
+                try:
+                    with open(chemin_prompt, "r", encoding="utf-8") as f:
+                        prompt_content = f.read()
+                except FileNotFoundError:
+                    st.error(f"Erreur : Le fichier de prompt '{nom_fichier_prompt}' est introuvable dans le dossier 'prompts/'.")
+                    prompt_content = "Analyse cette radiographie. Renvoie uniquement un JSON valide avec les clés : image_quality, predicted_class, confidence, visual_evidence, justification, limitations, warning."
+
+                raw_pred = vlm_predict(tmp_path, prompt=prompt_content)
+
+            # 2. Application des garde-fous
+            pred = apply_safety_guardrails(raw_pred)
+
+            # 3. Sauvegarde en DB
             st.session_state.analyse_count += 1
-            save_run(uploaded.name, pred, mode)
+            save_run(uploaded.name, pred, moteur)
 
-            st.metric("Classe", pred["predicted_class"])
+            # 4. Affichage UI
+            st.metric("Classe", pred.get("predicted_class", "Erreur"))
 
-            conf = pred["confidence"]
+            conf = pred.get("confidence", 0.0)
             if conf >= 0.75:
                 badge_color = "#2ecc71"
                 badge_label = "Élevée"
@@ -375,9 +397,12 @@ elif st.session_state.page == "analyse":
             </div>
             """, unsafe_allow_html=True)
 
-            st.write("**Observations**", pred["visual_evidence"])
-            st.write("**Justification**", pred["justification"])
-            st.write("**Limites**", pred["limitations"])
+            if "warning" in pred and pred["warning"]:
+                st.warning(pred["warning"])
+
+            st.write("**Observations**", pred.get("visual_evidence", ["Non disponible"]))
+            st.write("**Justification**", pred.get("justification", "Non disponible"))
+            st.write("**Limites**", pred.get("limitations", ["Non disponible"]))
             st.json(pred)
     else:
         st.info("Utiliser les images synthétiques dans data/sample_images pour tester le flux.")
@@ -449,6 +474,10 @@ elif st.session_state.page == "rapports":
                 """, unsafe_allow_html=True)
                 st.markdown(f"**Date :** {created_at[:19]}")
                 st.markdown(f"**Modèle :** {model_name}")
+                
+                if "warning" in pred and pred["warning"]:
+                    st.warning(pred["warning"])
+
                 st.write("**Observations**", pred.get("visual_evidence", "—"))
                 st.write("**Justification**", pred.get("justification", "—"))
                 st.write("**Limites**", pred.get("limitations", "—"))

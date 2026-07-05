@@ -9,11 +9,12 @@ STEP 5 - Classify based on steps above.
 
 Then return ONLY this JSON (no extra text):
 {
+  "image_quality": "<good | limited | poor>",
   "predicted_class": "<normal | suspected_opacity | uncertain>",
   "confidence": <float 0.0-1.0>,
-  "visual_evidence": "<findings from steps 1-4>",
+  "visual_evidence": ["<finding 1 from steps 1-4>", "<finding 2 from steps 1-4>"],
   "justification": "<reasoning linking findings to class>",
-  "limitations": "<quality or ambiguity issues>",
+  "limitations": ["<quality issue 1>", "<ambiguity issue 2>"],
   "warning": "AI prototype for educational use only. Not a medical device. Consult a radiologist."
 }
 Rule: if confidence < 0.60 → predicted_class must be uncertain.
