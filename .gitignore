@@ -9,6 +9,7 @@ eval/outputs/
 .env
 .DS_Store
 
+env/
 # Local/professor visual material
 # assets/
 
