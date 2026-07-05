@@ -15,7 +15,7 @@ WARNING = "Prototype pédagogique. Non destiné au diagnostic. Validation par un
 # CONFIGURATION DU SERVEUR LOCAL (LM Studio ou Ollama)
 # ---------------------------------------------------------
 
-LOCAL_SERVER_URL = "http://localhost:1234/v1"
+LOCAL_SERVER_URL = "http://100.79.99.38:1234/v1"
 MODEL_NAME = "medgemma-4b"
 
 client = OpenAI(base_url=LOCAL_SERVER_URL, api_key="not-needed")
