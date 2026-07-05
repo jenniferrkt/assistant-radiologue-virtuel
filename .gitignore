@@ -1,4 +1,5 @@
 .venv/
+env/
 __pycache__/
 *.pyc
 .pytest_cache/
@@ -9,11 +10,12 @@ eval/outputs/
 .env
 .DS_Store
 
-# Local/professor visual material
-# assets/
+env/
+
 
 # Local review / rollback material
 .rollback*/
 
 # Local duplicate; the shareable PDF lives in docs/appel_offre.pdf
 /appel_offre.pdf
+
