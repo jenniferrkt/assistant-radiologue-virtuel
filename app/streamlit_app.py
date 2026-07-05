@@ -9,7 +9,7 @@ from datetime import datetime
 import streamlit as st
 from PIL import Image
 
-from src.inference import toy_predict
+from src.inference import toy_predict, vlm_predict
 from src.guardrails import apply_safety_guardrails
 
 st.set_page_config(page_title="Arvi-RX", layout="wide")
@@ -144,11 +144,11 @@ def save_run(image_path: str, pred: dict, mode: str):
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         image_path,
-        pred.get("model_name", f"toy-rule-{mode}"),
+        pred.get("model_name", f"model-{mode}"),
         pred.get("prompt_version", f"{mode}_v1"),
         json.dumps(pred),
-        pred["predicted_class"],
-        pred["confidence"],
+        pred.get("predicted_class", "unknown"),
+        pred.get("confidence", 0.0),
         pred.get("latency_ms", 0),
         datetime.now().isoformat(),
     ))
@@ -260,7 +260,14 @@ elif st.session_state.page == "analyse":
     st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
     uploaded = st.file_uploader("Déposer une radiographie thoracique frontale", type=["png", "jpg", "jpeg"])
-    mode = st.selectbox("Mode", ["baseline", "improved"])
+    moteur = st.selectbox(
+        "Moteur d'analyse", 
+        [
+            "Simulation (Test rapide)", 
+            "MedGemma 4B - Baseline", 
+            "MedGemma 4B - Improved (Recommandé)"
+        ]
+    )
 
     if uploaded:
         suffix = Path(uploaded.name).suffix
@@ -271,14 +278,37 @@ elif st.session_state.page == "analyse":
         col1, col2 = st.columns([1, 1])
         with col1:
             st.image(Image.open(tmp_path), caption="Image uploadée", use_container_width=True)
+            
         with col2:
-            pred = apply_safety_guardrails(toy_predict(tmp_path, mode=mode))
+            # 1. Sélection et exécution du bon moteur
+            if moteur == "Simulation (Test rapide)":
+                raw_pred = toy_predict(tmp_path, mode="baseline")
+                mode_for_db = "simulation"
+            else:
+                nom_fichier_prompt = "baseline_prompt.txt" if moteur == "MedGemma 4B - Baseline" else "improved_prompt.txt"
+                chemin_prompt = f"./prompts/{nom_fichier_prompt}"
+                
+                try:
+                    with open(chemin_prompt, "r", encoding="utf-8") as f:
+                        prompt_content = f.read()
+                except FileNotFoundError:
+                    st.error(f"Erreur : Le fichier de prompt '{nom_fichier_prompt}' est introuvable dans le dossier 'prompts/'.")
+                    prompt_content = "Analyse cette radiographie. Renvoie uniquement un JSON valide avec les clés : image_quality, predicted_class, confidence, visual_evidence, justification, limitations, warning."
+
+                raw_pred = vlm_predict(tmp_path, prompt=prompt_content)
+                mode_for_db = "baseline" if moteur == "MedGemma 4B - Baseline" else "improved"
+
+            # 2. Application des garde-fous de sécurité communs
+            pred = apply_safety_guardrails(raw_pred)
+
+            # 3. Sauvegarde et mise à jour de la session
             st.session_state.analyse_count += 1
-            save_run(uploaded.name, pred, mode)
+            save_run(uploaded.name, pred, mode_for_db)
 
-            st.metric("Classe", pred["predicted_class"])
+            # 4. Affichage du design
+            st.metric("Classe", pred.get("predicted_class", "Erreur"))
 
-            conf = pred["confidence"]
+            conf = pred.get("confidence", 0.0)
             if conf >= 0.75:
                 badge_color = "#2ecc71"
                 badge_label = "Élevée"
@@ -296,10 +326,14 @@ elif st.session_state.page == "analyse":
                 <div style="font-size:1.4rem; font-weight:700; color:{badge_color};">{round(conf*100)}% — {badge_label}</div>
             </div>
             """, unsafe_allow_html=True)
+            
+            # Affichage élégant de l'alerte de sécurité si présente
+            if "warning" in pred and pred["warning"]:
+                st.warning(pred["warning"])
 
-            st.write("**Observations**", pred["visual_evidence"])
-            st.write("**Justification**", pred["justification"])
-            st.write("**Limites**", pred["limitations"])
+            st.write("**Observations**", pred.get("visual_evidence", ["Non disponible"]))
+            st.write("**Justification**", pred.get("justification", "Non disponible"))
+            st.write("**Limites**", pred.get("limitations", ["Non disponible"]))
             st.json(pred)
     else:
         st.info("Utiliser les images synthétiques dans data/sample_images pour tester le flux.")
