@@ -68,6 +68,7 @@ curl -X POST "http://127.0.0.1:8000/predict" \
 La réponse contient une classe, une confiance, des observations visuelles, une justification, des limites et l'avertissement non clinique.
 
 ## Organisation du dépôt
+```
 assistant-radiologue-virtuel/
 ├── .github/workflows/ci.yml           # Intégration continue
 ├── api/main.py                        # API FastAPI de démonstration
@@ -96,7 +97,7 @@ assistant-radiologue-virtuel/
 ├── pyproject.toml
 ├── requirements-test.txt
 └── requirements.txt
-
+```
 ## Livrables
 
 | Niveau | Attendu |
