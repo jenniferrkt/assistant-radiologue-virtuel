@@ -1,0 +1,21 @@
+case_id,image_path,source,label,split,quality,notes
+RSNA_001,data/sample_images/image01_normal.png,RSNA Pneumonia,normal,smoke,good,RSNA normal case
+RSNA_002,data/sample_images/image01_suspected_opacity.png,RSNA Pneumonia,suspected_opacity,smoke,good,RSNA opacity case
+RSNA_003,data/sample_images/image01_uncertain.png,RSNA Pneumonia,uncertain,smoke,good,RSNA uncertain case
+RSNA_004,data/sample_images/image02_normal.png,RSNA Pneumonia,normal,smoke,good,RSNA normal case
+RSNA_005,data/sample_images/image02_suspected_opacity.png,RSNA Pneumonia,suspected_opacity,smoke,good,RSNA opacity case
+RSNA_006,data/sample_images/image02_uncertain.png,RSNA Pneumonia,uncertain,smoke,good,RSNA uncertain case
+RSNA_007,data/sample_images/image03_normal.png,RSNA Pneumonia,normal,smoke,good,RSNA normal case
+RSNA_008,data/sample_images/image03_suspected_opacity.png,RSNA Pneumonia,suspected_opacity,smoke,good,RSNA opacity case
+RSNA_009,data/sample_images/image03_uncertain.png,RSNA Pneumonia,uncertain,smoke,good,RSNA uncertain case
+RSNA_010,data/sample_images/image04_normal.png,RSNA Pneumonia,normal,smoke,good,RSNA normal case
+RSNA_011,data/sample_images/image04_suspected_opacity.png,RSNA Pneumonia,suspected_opacity,smoke,good,RSNA opacity case
+RSNA_012,data/sample_images/image04_uncertain.png,RSNA Pneumonia,uncertain,smoke,good,RSNA uncertain case
+RSNA_013,data/sample_images/image05_normal.png,RSNA Pneumonia,normal,smoke,good,RSNA normal case
+RSNA_014,data/sample_images/image05_suspected opacity.png,RSNA Pneumonia,suspected_opacity,smoke,good,RSNA opacity case
+RSNA_015,data/sample_images/image05_uncertain.png,RSNA Pneumonia,uncertain,smoke,good,RSNA uncertain case
+RSNA_016,data/sample_images/image06_normal.png,RSNA Pneumonia,normal,smoke,good,RSNA normal case
+RSNA_017,data/sample_images/image06_suspected_opacity.png,RSNA Pneumonia,suspected_opacity,smoke,good,RSNA opacity case
+RSNA_018,data/sample_images/image06_uncertain.png,RSNA Pneumonia,uncertain,smoke,good,RSNA uncertain case
+RSNA_019,data/sample_images/image07_normal.png,RSNA Pneumonia,normal,smoke,good,RSNA normal case
+RSNA_020,data/sample_images/image07_suspected_opacity.png,RSNA Pneumonia,suspected_opacity,smoke,good,RSNA opacity case
