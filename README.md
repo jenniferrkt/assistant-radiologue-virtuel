@@ -90,10 +90,10 @@ assistant-radiologue-virtuel/
 │   ├── gemma4_unsloth_lora_stub.py    # Fine-tuning LoRA avec Unsloth - Gemma 4
 │   └── medgemma_peft_qlora_stub.py    # Stub expérimental MedGemma/PEFT
 ├── notebooks/
-│   ├── 01_baseline_vlm.ipynb          # (à compléter)
-│   ├── 02_prompt_comparison.ipynb     # (à compléter) comparaison V1/V2/V3
-│   ├── 03_optional_finetuning_lora.ipynb  # (à compléter) fine-tuning LoRA
-│   └── 04_error_register_generation.ipynb # Génération du registre d'erreurs sur les 20 images RSNA
+│   ├── 01_baseline_vlm.ipynb          
+│   ├── 02_prompt_comparison.ipynb     
+│   ├── 03_optional_finetuning_lora.ipynb  
+│   └── 04_error_register_generation.ipynb 
 ├── prompts/                           # Prompts baseline / few-shot / amélioré + schéma JSON
 ├── sql/schema.sql                     # Schéma de la base SQLite
 ├── src/                               # Inférence, garde-fous, métriques, prétraitement, base de données
